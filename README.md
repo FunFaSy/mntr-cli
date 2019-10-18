@@ -35,6 +35,16 @@ $ cd mntr-cli/
 $ ./bin/run -p PRIVATE_KEY -n https://gungnir.stakeholder.space --rate 100 --duration 10 -s Mxbc04b1c077df678355c6c7c924d0f59ce66acf4f
 ```
 
-## Commands
+## Command Params
 
-<!-- commands -->
+Available CLI arguments
+
+* `--privateKey / -p` _[string]_  - Wallet private key which will be used to send transactions.
+* `--node / -n` _[string]_ - A node URI to connect to.
+* `--send_to / -s` _[string]_ - The address of test transactions retriever
+* `--rate / -r` _[integer=2000]_ - The amount of requests per second.
+* `--duration / -d` _[integer=60]_ - The duration of test in seconds
+* `--coin / -c` _[string='MNT']_ - A coin to use for transactions
+* `--amount / -a` _[float='0.01']_ - The amount of coins used for a test transactions
+* `--maxSockets / -m` _[integer=2048]_ - Max sockets amount
+* `--chainId / -i` _[string='2']_ - Chain ID to use: 1 for mainnet and 2 for testnet
