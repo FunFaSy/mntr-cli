@@ -1,7 +1,7 @@
 import {from, Observable, zip} from 'rxjs'
 import {mergeMap} from 'rxjs/operators'
 
-import {CustomWallet, StressTestContext} from '../types'
+import {StressTestContext, Wallet} from '../types'
 import {average} from '../utils'
 
 import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND} from './constants'
@@ -34,7 +34,7 @@ export function proccessTransactionGroups(
   commisionSize: number,
   generateWallet: WalletsGenerator,
   context: StressTestContext
-): Observable<CustomWallet> {
+): Observable<Wallet> {
   context.logger.debug({
     message: `Depth Index: ${ depthIndex }, Group Size: ${ groupSize }, MoneyToSpend: ${ moneyToSpend }, Commision Size: ${ commisionSize }`
   })

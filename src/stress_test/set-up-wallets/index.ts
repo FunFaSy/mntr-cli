@@ -6,7 +6,7 @@ import {privateToAddressString} from 'minterjs-util'
 import {Observable, throwError} from 'rxjs'
 import {bufferCount, catchError, tap, toArray} from 'rxjs/operators'
 
-import {CustomWallet, StressTestContext} from '../types'
+import {StressTestContext, Wallet} from '../types'
 import {range, sum} from '../utils'
 
 import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, ONE_PIP} from './constants'
@@ -47,7 +47,7 @@ export async function setUpWallets$(
   walletsQuantity: number,
   generateWallets: WalletsGenerator,
   context: StressTestContext
-): Promise<Observable<CustomWallet>> {
+): Promise<Observable<Wallet>> {
   const {depthIndex: maxDepthIndex, groupSize} = getTopLevelTransactionGroupParams(walletsQuantity)
   const commisionSize = await getCommisionSize(context)
 

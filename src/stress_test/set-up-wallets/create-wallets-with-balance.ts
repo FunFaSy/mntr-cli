@@ -3,24 +3,24 @@ import pLimit from 'p-limit'
 import {from} from 'rxjs'
 import {delay, mergeMap} from 'rxjs/operators'
 
-import {CustomWallet, StressTestContext} from '../types'
+import {StressTestContext, Wallet} from '../types'
 import {backoffedPromise} from '../utils'
 
 const rateLimiter = pLimit(20)
 
-export type WalletsGenerator = (walletsQuantity: number) => Promise<CustomWallet[]>
+export type WalletsGenerator = (walletsQuantity: number) => Promise<Wallet[]>
 
 export async function createWalletsWithBalance(
   initialBalance: number,
   walletsQuantity: number, // 100 is max
   generateWallets: WalletsGenerator,
   context: StressTestContext
-): Promise<CustomWallet[]> {
+): Promise<Wallet[]> {
   if (walletsQuantity > 100) {
     throw Error('You cannot create more than 100 wallets with initial balance at once.')
   }
 
-  const wallets: CustomWallet[] = await generateWallets(walletsQuantity)
+  const wallets: Wallet[] = await generateWallets(walletsQuantity)
 
   await rateLimiter(() => (
     backoffedPromise(() =>

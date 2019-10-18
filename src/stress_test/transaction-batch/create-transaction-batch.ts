@@ -3,7 +3,7 @@ import {forkJoin, from, Observable, of} from 'rxjs'
 import {catchError, map, tap} from 'rxjs/operators'
 
 import {RequestStatus, Status} from '../request-status'
-import {CustomWallet, StressTestContext} from '../types'
+import {Wallet, StressTestContext} from '../types'
 import {backoffedPromise} from '../utils'
 
 function createAndSendTransaction(context: StressTestContext) {
@@ -60,12 +60,12 @@ function createAndSendTransaction(context: StressTestContext) {
   )
 }
 
-export function createTransactionBatch(wallets: CustomWallet[], context: StressTestContext): Observable<RequestStatus[]> {
+export function createTransactionBatch(wallets: Wallet[], context: StressTestContext): Observable<RequestStatus[]> {
   return forkJoin(
     wallets.map(wallet => createAndSendTransaction({
       ...context,
       privateKey: wallet.privateKey,
-    }).toPromise())
+    }))
   ).pipe(
     tap(results => context.logger.debug(`Received results: ${ JSON.stringify(results) }`))
   )

@@ -1,16 +1,7 @@
+import {Minter} from 'minter-js-sdk'
 import {Logger} from 'winston'
 
-export interface MinterClient {
-  postTx(txParams: any, params?: object): Promise<string>
-  estimateTxCommission(tx: any): Promise<number>
-}
-
 export interface Wallet {
-  getAddressString(): string
-  getPrivateKeyString(): string
-}
-
-export interface CustomWallet {
   address: string
   privateKey: string
 }
@@ -28,6 +19,6 @@ export interface StressTestParams {
 }
 
 export type StressTestContext = StressTestParams & {
-  minterClient: MinterClient,
+  minterClient: Minter,
   logger: Logger
 }
