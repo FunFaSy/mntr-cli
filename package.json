@@ -1,0 +1,58 @@
+{
+  "name": "mntr-cli",
+  "description": "A stress test CLI tool for Minter blockhain",
+  "version": "1.0.19",
+  "author": "German Ivanov <germivanov@gmail.com>",
+  "bin": {
+    "mntr": "./bin/run"
+  },
+  "bugs": "https://github.com/tasyp/mntr-cli/issues",
+  "dependencies": {
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "@oclif/errors": "^1.2.2",
+    "@oclif/plugin-help": "^2",
+    "cli-ux": "^5.3.2",
+    "dot-prop": "^5.1.0",
+    "minter-js-sdk": "^0.20.2",
+    "minterjs-util": "^0.13.0",
+    "node-worker-threads-pool": "^1.1.0",
+    "p-limit": "^2.2.1",
+    "rxjs": "^6.5.3",
+    "simple-backoff": "^1.1.0",
+    "tslib": "^1",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@oclif/tslint": "^3",
+    "@types/node": "^12.7.12",
+    "@types/uuid": "^3.4.5",
+    "@types/winston": "^2.4.4",
+    "ts-node": "^8.4.1",
+    "tslint": "^5",
+    "typescript": "^3.3"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib"
+  ],
+  "homepage": "https://github.com/tasyp/mntr-cli",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "oclif": {
+    "bin": "mntr"
+  },
+  "repository": "tasyp/mntr-cli",
+  "scripts": {
+    "posttest": "tslint -p . -t stylish",
+    "prepack": "rm -rf lib && tsc -b",
+    "test": "echo NO TESTS"
+  },
+  "types": "lib/index.d.ts"
+}
