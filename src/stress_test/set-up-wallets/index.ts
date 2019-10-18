@@ -32,7 +32,6 @@ export async function getCommisionSize(context: StressTestContext): Promise<numb
     transaction: prepareSignedTx(
       new SendTxParams({
         privateKey: context.privateKey,
-        chainId: 2,
         nonce: 1,
         address: privateToAddressString(Buffer.from(context.privateKey, 'hex')),
         amount: 1,

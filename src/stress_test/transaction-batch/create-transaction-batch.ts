@@ -12,7 +12,6 @@ function createAndSendTransaction(context: StressTestContext) {
       context.minterClient.postTx(
         new SendTxParams({
           privateKey: context.privateKey,
-          chainId: 2,
           address: context.address,
           amount: context.transeferedCoinAmount,
           coinSymbol: context.coin,

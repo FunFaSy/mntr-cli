@@ -23,6 +23,7 @@ export interface StressTestParams {
   maxSockets: number
   transeferedCoinAmount: number
   coin: string
+  chainId: string
   nodeBaseUrl: string
 }
 

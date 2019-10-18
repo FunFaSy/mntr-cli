@@ -18,9 +18,8 @@ class Mntr extends Command {
     duration: flags.integer({char: 'd', default: 60, description: 'The duration of test in seconds'}),
     amount: flags.string({char: 'a', default: '0.01', description: 'The amount of coins used for test transactions'}),
     maxSockets: flags.integer({char: 'm', default: 2048, description: 'Max sockets amount'}),
+    chainId: flags.string({char: 'c', default: '2', description: 'Chain ID to use: 1 for mainnet and 2 for testnet'}),
   }
-
-  static args = [{name: 'file'}]
 
   async run() {
     supressConsoleLog() // minter-js-sdk prints out logs it wasn't asked for
@@ -34,6 +33,7 @@ class Mntr extends Command {
       transeferedCoinAmount: amount,
       coin: flags.coin,
       maxSockets: flags.maxSockets,
+      chainId: flags.chainId,
       address: flags.send_to,
       nodeBaseUrl: flags.node,
       durationInSeconds: flags.duration,

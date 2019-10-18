@@ -3,17 +3,18 @@ import {Minter} from 'minter-js-sdk'
 import * as winston from 'winston'
 
 import {MinterClient, StressTestContext, StressTestParams} from './types'
-
+ 
 export const createStressTestContext = (params: StressTestParams): StressTestContext => {
   const minterClient: MinterClient = new Minter({
     apiType: 'node',
+    chainId: params.chainId,
     baseURL: params.nodeBaseUrl,
     httpsAgent: new https.Agent({
       keepAlive: true,
       maxSockets: params.maxSockets,
       timeout: 60 * 1000,
       rejectUnauthorized: false
-    })
+    })    
   })
 
   const logger = winston.createLogger({

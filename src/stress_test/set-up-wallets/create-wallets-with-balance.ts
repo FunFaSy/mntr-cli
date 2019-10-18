@@ -27,7 +27,6 @@ export async function createWalletsWithBalance(
       context.minterClient.postTx(
         new MultisendTxParams({
           privateKey: context.privateKey,
-          chainId: 2,
           list: wallets.map(wallet => ({
             value: initialBalance,
             coin: context.coin,
