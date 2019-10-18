@@ -4,7 +4,7 @@
   "version": "1.0.23",
   "author": "German Ivanov <germivanov@gmail.com>",
   "bin": {
-    "mntr": "./bin/run"
+    "mntr-cli": "./bin/run"
   },
   "bugs": "https://github.com/tasyp/mntr-cli/issues",
   "dependencies": {
@@ -46,7 +46,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "oclif": {
-    "bin": "mntr"
+    "bin": "mntr-cli"
   },
   "repository": "tasyp/mntr-cli",
   "scripts": {
