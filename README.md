@@ -25,6 +25,7 @@ $ ulimit -n 2048
 
 To use production version:
 ```
+$ yarn global add mntr-cli
 $ npx mntr-cli -p PRIVATE_KEY -n https://gungnir.stakeholder.space --rate 100 --duration 10 -s Mxbc04b1c077df678355c6c7c924d0f59ce66acf4f
 ```
 To use dev version:
