@@ -1,7 +1,7 @@
 {
   "name": "mntr-cli",
   "description": "A stress test CLI tool for Minter blockhain",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "author": "German Ivanov <germivanov@gmail.com>",
   "bin": {
     "mntr": "./bin/run"
