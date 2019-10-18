@@ -8,7 +8,6 @@ import {bufferCount, catchError, tap, toArray} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
 import {range, sum} from '../utils'
-
 import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, ONE_PIP} from './constants'
 import {WalletsGenerator} from './create-wallets-with-balance'
 import {proccessTransactionGroups} from './proccess-transaction-groups'

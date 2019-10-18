@@ -60,6 +60,8 @@ declare module 'minter-js-sdk' {
 
   function prepareSignedTx(txParams: TxParams): any
 
+  function generateWallet(): Wallet
+
   class Wallet {
     constructor(priv?: Buffer, mnemonic?: string)
     getAddressString(): string
