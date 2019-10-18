@@ -4,6 +4,8 @@ import cli from 'cli-ux'
 import {createStressTest} from './stress_test'
 import {supressConsoleLog} from './utils'
 
+require('events').EventEmitter.defaultMaxListeners = 50;
+
 class Mntr extends Command {
   static description = 'A stress test CLI tool for Minter blockhain'
 
