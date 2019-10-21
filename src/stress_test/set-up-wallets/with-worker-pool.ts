@@ -19,7 +19,6 @@ export async function withWorkerPool<T>(wrapperFunc: (pool: StaticPool) => Promi
     task: getWorkerPath(),
   })
 
-
   const result = await withOnCompleteCallback<T>(
     () => wrapperFunc(pool), 
     () => pool.destroy()

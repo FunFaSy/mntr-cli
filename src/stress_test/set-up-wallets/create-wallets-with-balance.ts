@@ -1,12 +1,14 @@
 import {MultisendTxParams} from 'minter-js-sdk'
-import pLimit from 'p-limit'
+import pThrottle from 'p-throttle'
 import {from} from 'rxjs'
 import {delay, mergeMap} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
 import {backoffedPromise} from '../utils'
 
-const rateLimiter = pLimit(20)
+const rateLimiter = pThrottle(async (func: () => Promise<any>) => {
+  return await func()
+}, 100, 5000)
 
 export type WalletsGenerator = (walletsQuantity: number) => Promise<Wallet[]>
 

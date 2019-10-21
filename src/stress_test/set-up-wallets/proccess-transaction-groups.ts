@@ -21,10 +21,10 @@ function getMoneyPerGroup(groupSize: number, moneyToSpend: number, commisionSize
   const currentDepthTransactionsCount = Math.ceil(groupSize) * MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND
 
   const currentDepthCommisionSize = currentDepthTransactionsCount * (
-    commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * commisionSize / 2
+    commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * commisionSize  / 2
   )
 
-  return (moneyToSpend - currentDepthCommisionSize) / Math.ceil(groupSize)
+  return Math.ceil((moneyToSpend - currentDepthCommisionSize) / Math.ceil(groupSize))
 }
 
 export function proccessTransactionGroups(
@@ -41,7 +41,7 @@ export function proccessTransactionGroups(
 
   if (depthIndex === 0) {
     return createWalletsWithBalance$((
-      context.transeferedCoinAmount + commisionSize * 5
+      context.transeferedCoinAmount + commisionSize * 50
     ), groupSize, generateWallet, context)
   }
 

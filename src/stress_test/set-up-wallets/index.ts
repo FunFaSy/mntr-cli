@@ -52,7 +52,7 @@ export async function setUpWallets$(
 
   const zeroDepthTransactionsCount = groupSize * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, maxDepthIndex)
   const zeroDepthMoneyNeeded = (
-    zeroDepthTransactionsCount * (context.transeferedCoinAmount + commisionSize * 10)
+    zeroDepthTransactionsCount * (context.transeferedCoinAmount + commisionSize * 50)
   )
 
   const totalMoneyNeeded = sum([

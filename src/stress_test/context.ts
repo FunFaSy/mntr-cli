@@ -12,7 +12,7 @@ export const createStressTestContext = (params: StressTestParams): StressTestCon
     httpsAgent: new https.Agent({
       keepAlive: true,
       maxSockets: params.maxSockets,
-      timeout: 60 * 1000,
+      timeout: 10 * 1000,
       rejectUnauthorized: false
     })
   })

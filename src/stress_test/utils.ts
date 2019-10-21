@@ -30,7 +30,7 @@ export async function backoffedPromise <T>(createPromise: () => Promise<T>) {
         throw err
       }
 
-      if (retryCount > 4) {
+      if (retryCount > 2) {
         throw err
       }
     }
