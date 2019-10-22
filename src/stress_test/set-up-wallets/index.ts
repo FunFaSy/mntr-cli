@@ -8,6 +8,7 @@ import {bufferCount, catchError, tap, toArray} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
 import {range, sum} from '../utils'
+
 import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, ONE_PIP} from './constants'
 import {WalletsGenerator} from './create-wallets-with-balance'
 import {proccessTransactionGroups} from './proccess-transaction-groups'
@@ -52,7 +53,7 @@ export async function setUpWallets$(
 
   const zeroDepthTransactionsCount = groupSize * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, maxDepthIndex)
   const zeroDepthMoneyNeeded = (
-    zeroDepthTransactionsCount * (context.transeferedCoinAmount + commisionSize * 50)
+    zeroDepthTransactionsCount * (context.transeferedCoinAmount + commisionSize * 52)
   )
 
   const totalMoneyNeeded = sum([
@@ -61,7 +62,7 @@ export async function setUpWallets$(
       const transactionsCount = Math.ceil(groupSize) * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, depthIndex)
       const multiSendCommisionSize = transactionsCount * (
         commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * commisionSize / 2
-      )
+      ) * 10
       return multiSendCommisionSize
     }),
   ])
@@ -110,7 +111,7 @@ const getQuantityOfCoinsFromErrorMessage = (coin: string, txResultMessage?: stri
     return null
   }
   const possiblyNumber = parseInt(coinsQuantity.trim(), 10)
-  return possiblyNumber !== NaN ? possiblyNumber / ONE_PIP : null
+  return !isNaN(possiblyNumber) ? possiblyNumber / ONE_PIP : null
 }
 
 export async function setUpWallets(walletsQuantity: number, rate: number, context: StressTestContext) {

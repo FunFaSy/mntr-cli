@@ -4,7 +4,7 @@ import cli from 'cli-ux'
 import {createStressTest} from './stress_test'
 import {supressConsoleLog} from './utils'
 
-require('events').EventEmitter.defaultMaxListeners = 50;
+require('events').EventEmitter.defaultMaxListeners = 50
 
 class Mntr extends Command {
   static description = 'A stress test CLI tool for Minter blockhain'
@@ -18,7 +18,7 @@ class Mntr extends Command {
     send_to: flags.string({char: 's', required: true, description: 'The address of test transactions retriever'}),
     rate: flags.integer({char: 'r', default: 2000, description: 'The amount of requests per second'}),
     duration: flags.integer({char: 'd', default: 60, description: 'The duration of test in seconds'}),
-    amount: flags.string({char: 'a', default: '0.01', description: 'The amount of coins used for test transactions'}),
+    amount: flags.string({char: 'a', default: '0.000001', description: 'The amount of coins used for test transactions'}),
     maxSockets: flags.integer({char: 'm', default: 2048, description: 'Max sockets amount'}),
     chainId: flags.string({char: 'i', default: '2', description: 'Chain ID to use: 1 for mainnet and 2 for testnet'}),
   }
@@ -54,7 +54,8 @@ class Mntr extends Command {
       ...stressTestResult.failedNodeResponsesStats.entries()
     ].map(([key, value]) => ({
       statusCode: key,
-      count: value
+      count: value,
+      message: stressTestResult.failedNodeResponsesMessages.get(key) || ''
     }))
 
     if (failedNodeResponses.length > 0) {
@@ -65,6 +66,9 @@ class Mntr extends Command {
         count: {
           header: 'Count'
         },
+        message: {
+          header: 'Error payload'
+        }
       })
     }
 

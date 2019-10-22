@@ -7,7 +7,7 @@ import {StressTestContext, Wallet} from '../types'
 import {backoffedPromise} from '../utils'
 
 const rateLimiter = pThrottle(async (func: () => Promise<any>) => {
-  return await func()
+  return func()
 }, 100, 5000)
 
 export type WalletsGenerator = (walletsQuantity: number) => Promise<Wallet[]>

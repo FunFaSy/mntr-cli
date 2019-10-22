@@ -1,10 +1,17 @@
 import {SendTxParams} from 'minter-js-sdk'
-import {forkJoin, from, Observable, of} from 'rxjs'
-import {catchError, map, tap} from 'rxjs/operators'
+import {from, merge, Observable, of, throwError} from 'rxjs'
+import {catchError, map, tap, timeoutWith} from 'rxjs/operators'
 
 import {RequestStatus, Status} from '../request-status'
-import {Wallet, StressTestContext} from '../types'
+import {StressTestContext, Wallet} from '../types'
 import {backoffedPromise} from '../utils'
+
+const getTimeoutError = () => {
+  const err = new Error('Request has timed out')
+  // @ts-ignore
+  err.code = 'TIMED_OUT'
+  return err
+}
 
 function createAndSendTransaction(context: StressTestContext) {
   const createTransaction = async () => (
@@ -22,6 +29,7 @@ function createAndSendTransaction(context: StressTestContext) {
   )
 
   return from(createTransaction()).pipe(
+    timeoutWith(120 * 1000, throwError(getTimeoutError())),
     map(() => {
       const requestStatus: RequestStatus = {
         nodeResponse: {
@@ -37,12 +45,14 @@ function createAndSendTransaction(context: StressTestContext) {
         nodeResponse: {
           status: Status.FAILED,
           statusCode: err.response.status.toString(),
+          statusMessage: err.response.data.error.data,
         },
         transactionStatus: err.response.status === 412 ? Status.FAILED : Status.OK
       } : {
         nodeResponse: {
           status: Status.FAILED,
           statusCode: err.code,
+          statusMessage: '',
         },
         transactionStatus: Status.FAILED
       }
@@ -60,9 +70,9 @@ function createAndSendTransaction(context: StressTestContext) {
   )
 }
 
-export function createTransactionBatch(wallets: Wallet[], context: StressTestContext): Observable<RequestStatus[]> {
-  return forkJoin(
-    wallets.map(wallet => createAndSendTransaction({
+export function createTransactionBatch(wallets: Wallet[], context: StressTestContext): Observable<RequestStatus> {
+  return merge(
+    ...wallets.map(wallet => createAndSendTransaction({
       ...context,
       privateKey: wallet.privateKey,
     }))

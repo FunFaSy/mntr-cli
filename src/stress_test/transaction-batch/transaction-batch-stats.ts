@@ -5,6 +5,7 @@ export interface TransactionBatchStats {
   succesfulNodeResponsesCount: number
   failedNodeResponsesCount: number
   failedNodeResponsesStats: Map<string, number> // status_code to quantity
+  failedNodeResponsesMessages: Map<string, string>
   succesfulTransactionsCount: number
   failedTransactionsCount: number
 }
@@ -14,6 +15,7 @@ export const getInitialTransactionBatchStats = (): TransactionBatchStats => ({
   succesfulNodeResponsesCount: 0,
   failedNodeResponsesCount: 0,
   failedNodeResponsesStats: new Map(),
+  failedNodeResponsesMessages: new Map(),
   succesfulTransactionsCount: 0,
   failedTransactionsCount: 0,
 })
@@ -35,6 +37,7 @@ export const mergeTransactionBatchStats = (
     failedNodeResponsesStats: mergeStringToNumberMaps(
       stressTestResult.failedNodeResponsesStats, transactionsBanchResult.failedNodeResponsesStats
     ),
+    failedNodeResponsesMessages: new Map([...transactionsBanchResult.failedNodeResponsesMessages, ...stressTestResult.failedNodeResponsesMessages]),
     succesfulTransactionsCount: (
       stressTestResult.succesfulTransactionsCount + transactionsBanchResult.succesfulTransactionsCount
     ),

@@ -11,6 +11,7 @@ export interface RequestStatus {
   } | {
     status: Status.FAILED,
     statusCode: string
+    statusMessage: string
   },
   transactionStatus: Status
 }
@@ -34,6 +35,15 @@ export function convertRequestStatusesToTransactionBanchStats(requestStatuses: R
         }
         return failedNodeResponsesStats
       }, new Map<string, number>()
+    ),
+    failedNodeResponsesMessages: failedNodeResponses.reduce(
+      (failedNodeResponsesMessages, requestStatus) => {
+        if (requestStatus.nodeResponse.status === Status.FAILED) {
+          const statusCode = requestStatus.nodeResponse.statusCode
+          failedNodeResponsesMessages.set(statusCode, requestStatus.nodeResponse.statusMessage)
+        }
+        return failedNodeResponsesMessages
+      }, new Map<string, string>()
     ),
     succesfulTransactionsCount: requestStatuses.filter(requestStatus => requestStatus.transactionStatus === Status.OK).length,
     failedTransactionsCount: requestStatuses.filter(requestStatus => requestStatus.transactionStatus === Status.FAILED).length,

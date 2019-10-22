@@ -21,17 +21,31 @@ export async function createStressTest(
   cli.action.stop('Done!')
   cli.action.start('Sending requests')
 
+  let passedSeconds = 0
+  let receivedRequests = 0
   return zip(
     interval(1000),
     from(wallets)
   ).pipe(
     take(params.durationInSeconds),
-    tap(([index, _]) => cli.action.start(`Sending requests ${ index + 1 }s/${ context.durationInSeconds }s`)),
+    tap(([index, _]) => {
+      passedSeconds = passedSeconds + 1
+      cli.action.start(`Sending requests ${ index + 1 }s/${ context.durationInSeconds }s`)
+      if (index + 1 === context.durationInSeconds) {
+        cli.action.stop('Done!')
+      }
+    }),
     mergeMap(([_, wallets]) => (
       createTransactionBatch(wallets, context)
     )),
-    map((requestStatuses: RequestStatus[]): TransactionBatchStats => (
-      convertRequestStatusesToTransactionBanchStats(requestStatuses)
+    tap(() => {
+      receivedRequests = receivedRequests + 1
+      if (passedSeconds === context.durationInSeconds) {
+        cli.action.start(`Received responses ${ receivedRequests }/${ walletsQuantity}`)
+      }
+    }),
+    map((requestStatuses: RequestStatus): TransactionBatchStats => (
+      convertRequestStatusesToTransactionBanchStats([requestStatuses])
     )),
     reduce((stressTestResult: TransactionBatchStats, transactionsBanchResult: TransactionBatchStats): TransactionBatchStats => (
       mergeTransactionBatchStats(stressTestResult, transactionsBanchResult)

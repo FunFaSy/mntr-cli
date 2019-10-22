@@ -1,6 +1,6 @@
 import {StaticPool} from 'node-worker-threads-pool'
 
-import { getWorkerPath } from './worker'
+import {getWorkerPath} from './worker'
 
 async function withOnCompleteCallback<T>(func: () => Promise<T>, onComplete: () => void) {
   try {
@@ -9,7 +9,7 @@ async function withOnCompleteCallback<T>(func: () => Promise<T>, onComplete: () 
     return result
   } catch (err) {
     onComplete()
-    throw err;
+    throw err
   }
 }
 
@@ -20,9 +20,9 @@ export async function withWorkerPool<T>(wrapperFunc: (pool: StaticPool) => Promi
   })
 
   const result = await withOnCompleteCallback<T>(
-    () => wrapperFunc(pool), 
+    () => wrapperFunc(pool),
     () => pool.destroy()
   )
-  
+
   return result
 }

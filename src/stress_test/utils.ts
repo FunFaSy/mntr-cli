@@ -17,7 +17,7 @@ export function mergeStringToNumberMaps(...maps: Map<string, number>[]): Map<str
 export async function backoffedPromise <T>(createPromise: () => Promise<T>) {
   const backoff = new FibonacciBackoff({
     min: 2000,
-    step: 2000,
+    step: 1000,
     jitter: 0.5,
   })
 
