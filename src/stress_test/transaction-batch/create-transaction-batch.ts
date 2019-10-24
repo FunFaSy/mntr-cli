@@ -21,9 +21,10 @@ function createAndSendTransaction(context: StressTestContext) {
           privateKey: context.privateKey,
           address: context.address,
           amount: context.transeferedCoinAmount,
+          gasPrice: 50,
           coinSymbol: context.coin,
           feeCoinSymbol: context.coin,
-        }), {gasRetryLimit: 4}
+        }), {gasRetryLimit: 0}
       )
     )
   )

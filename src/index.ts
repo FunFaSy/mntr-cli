@@ -18,7 +18,7 @@ class Mntr extends Command {
     send_to: flags.string({char: 's', required: true, description: 'The address of test transactions retriever'}),
     rate: flags.integer({char: 'r', default: 2000, description: 'The amount of requests per second'}),
     duration: flags.integer({char: 'd', default: 60, description: 'The duration of test in seconds'}),
-    amount: flags.string({char: 'a', default: '0.000001', description: 'The amount of coins used for test transactions'}),
+    amount: flags.string({char: 'a', default: '0.0001', description: 'The amount of coins used for test transactions'}),
     maxSockets: flags.integer({char: 'm', default: 2048, description: 'Max sockets amount'}),
     chainId: flags.string({char: 'i', default: '2', description: 'Chain ID to use: 1 for mainnet and 2 for testnet'}),
   }
@@ -29,6 +29,7 @@ class Mntr extends Command {
     const {flags} = this.parse(Mntr)
 
     const amount = parseFloat(flags.amount)
+
     const stressTest$ = await createStressTest({
       rate: flags.rate,
       privateKey: flags.privateKey,

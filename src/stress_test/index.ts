@@ -24,7 +24,7 @@ export async function createStressTest(
   let passedSeconds = 0
   let receivedRequests = 0
   return zip(
-    interval(1000),
+    interval(1500),
     from(wallets)
   ).pipe(
     take(params.durationInSeconds),

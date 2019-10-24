@@ -2,7 +2,7 @@ import {generateWallet} from 'minter-js-sdk'
 import {parentPort} from 'worker_threads'
 
 if (parentPort !== null) {
-  parentPort.on('message',param => {
+  parentPort.on('message', param => {
     parentPort && parentPort.postMessage([...Array(param)].map(() => {
       const wallet = generateWallet()
       return {
