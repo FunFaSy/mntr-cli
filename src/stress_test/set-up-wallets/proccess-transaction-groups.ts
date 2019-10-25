@@ -18,11 +18,11 @@ export function createGroupSizes$(groupSize: number, groupSizeReminder: number):
 }
 
 function getMoneyPerGroup(groupSize: number, moneyToSpend: number, commisionSize: number): number {
-  const currentDepthTransactionsCount = Math.ceil(groupSize) * MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND
+  const currentDepthTransactionsCount = Math.ceil(groupSize)
 
   const currentDepthCommisionSize = currentDepthTransactionsCount * (
-    commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * commisionSize  / 2
-  ) * 10
+    commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * (commisionSize / 2)
+  )
 
   return Math.ceil((moneyToSpend - currentDepthCommisionSize) / Math.ceil(groupSize))
 }

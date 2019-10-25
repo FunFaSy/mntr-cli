@@ -1,81 +1,26 @@
 import {CLIError} from '@oclif/errors'
 import {cli} from 'cli-ux'
 import * as dotProp from 'dot-prop'
-import {prepareSignedTx, SendTxParams} from 'minter-js-sdk'
-import {privateToAddressString} from 'minterjs-util'
 import {Observable, throwError} from 'rxjs'
 import {bufferCount, catchError, tap, toArray} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
-import {range, sum} from '../utils'
 
-import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, ONE_PIP} from './constants'
+import {getTopLevelTransactionGroup} from './top-level-transaction-group';
+import {ONE_PIP} from './constants'
 import {WalletsGenerator} from './create-wallets-with-balance'
 import {proccessTransactionGroups} from './proccess-transaction-groups'
 import {withWorkerPool} from './with-worker-pool'
-
-export function getTopLevelTransactionGroupParams(totalTransactionsQuantity: number): { depthIndex: number, groupSize: number } {
-  let groupSize = totalTransactionsQuantity
-  let depthIndex = 0
-  while (groupSize > MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND) {
-    groupSize = groupSize / MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND
-    depthIndex++
-  }
-  return {
-    depthIndex,
-    groupSize
-  }
-}
-
-export async function getCommisionSize(context: StressTestContext): Promise<number> {
-  const commisionSize = await context.minterClient.estimateTxCommission({
-    transaction: prepareSignedTx(
-      new SendTxParams({
-        privateKey: context.privateKey,
-        nonce: 1,
-        address: privateToAddressString(Buffer.from(context.privateKey, 'hex')),
-        amount: 1,
-        coinSymbol: context.coin,
-        feeCoinSymbol: context.coin,
-      })
-    ).serialize().toString('hex')
-  })
-  return commisionSize / ONE_PIP
-}
 
 export async function setUpWallets$(
   walletsQuantity: number,
   generateWallets: WalletsGenerator,
   context: StressTestContext
 ): Promise<Observable<Wallet>> {
-  const {depthIndex: maxDepthIndex, groupSize} = getTopLevelTransactionGroupParams(walletsQuantity)
-  const commisionSize = await getCommisionSize(context)
-
-  const zeroDepthTransactionsCount = groupSize * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, maxDepthIndex)
-  const zeroDepthMoneyNeeded = (
-    zeroDepthTransactionsCount * (context.transeferedCoinAmount + commisionSize * 52)
-  )
-
-  const totalMoneyNeeded = sum([
-    zeroDepthMoneyNeeded,
-    ...range(0, maxDepthIndex, 1).map(depthIndex => {
-      const transactionsCount = Math.ceil(groupSize) * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, depthIndex)
-      const multiSendCommisionSize = transactionsCount * (
-        commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * commisionSize / 2
-      ) * 10
-      return multiSendCommisionSize
-    }),
-  ])
-
-  context.logger.debug({
-    message: `Needed Wallets Quantity: ${ walletsQuantity }`
-  })
-  context.logger.debug({
-    message: `Top level group size: ${ groupSize }, Max Depth Index: ${ maxDepthIndex }, Zero Depth Money Needed: ${ zeroDepthMoneyNeeded }, Total money needed: ${ totalMoneyNeeded }`
-  })
+  const { depthIndex, groupSize, commisionSize, totalMoneyNeeded } = await getTopLevelTransactionGroup(walletsQuantity, context);
 
   let proccesedWalletsQunatity = 0
-  return proccessTransactionGroups(maxDepthIndex, groupSize, totalMoneyNeeded, commisionSize, generateWallets, context).pipe(
+  return proccessTransactionGroups(depthIndex, groupSize, totalMoneyNeeded, commisionSize, generateWallets, context).pipe(
     tap(() => {
       if (proccesedWalletsQunatity < walletsQuantity) {
         proccesedWalletsQunatity = proccesedWalletsQunatity + 1

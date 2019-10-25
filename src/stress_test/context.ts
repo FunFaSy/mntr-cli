@@ -14,7 +14,7 @@ export const createStressTestContext = (params: StressTestParams): StressTestCon
       maxSockets: params.maxSockets,
       timeout: 10 * 1000,
       rejectUnauthorized: false
-    })
+    }),
   })
 
   const logger = winston.createLogger({

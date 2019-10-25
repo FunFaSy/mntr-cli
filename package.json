@@ -28,8 +28,11 @@
     "@oclif/dev-cli": "^1.22.2",
     "@oclif/tslint": "^3",
     "@types/axios": "^0.14.0",
+    "@types/jest": "^24.0.19",
     "@types/node": "^12.7.12",
     "@types/winston": "^2.4.4",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
     "ts-node": "^8.4.1",
     "tslint": "^5",
     "typescript": "^3.3"
@@ -54,7 +57,15 @@
   "scripts": {
     "format": "tslint -p . -t stylish",
     "prepack": "rm -rf lib && tsc -b",
-    "test": "echo NO TESTS"
+    "test": "jest"
   },
-  "types": "lib/index.d.ts"
+  "types": "lib/index.d.ts",
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    }
+  }
 }
