@@ -15,7 +15,7 @@ const getTimeoutError = () => {
 
 function createAndSendTransaction(context: StressTestContext) {
   const createTransaction = async () => (
-    backoffedPromise(() =>
+    backoffedPromise(() => (
       context.minterClient.postTx(
         new SendTxParams({
           privateKey: context.privateKey,
@@ -26,7 +26,7 @@ function createAndSendTransaction(context: StressTestContext) {
           feeCoinSymbol: context.coin,
         }), {gasRetryLimit: 0}
       )
-    )
+    ), [429])
   )
 
   return from(createTransaction()).pipe(

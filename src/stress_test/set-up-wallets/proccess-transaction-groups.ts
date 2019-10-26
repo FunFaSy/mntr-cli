@@ -1,30 +1,30 @@
 import {from, Observable, zip} from 'rxjs'
-import {mergeMap} from 'rxjs/operators'
+import {map, mergeMap} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
-import {average} from '../utils'
+import {roundUpAtMostTwoDecimalPlaces, sum} from '../utils'
 
 import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND} from './constants'
 import {createWalletsWithBalance$, WalletsGenerator} from './create-wallets-with-balance'
 
-export function createGroupSizes$(groupSize: number, groupSizeReminder: number): Observable<number> {
+export function createGroupSizes(groupSize: number, groupSizeReminder: number): number[] {
   const groupSizes: number[] = Array(groupSize - groupSizeReminder).fill(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND)
   if (groupSizeReminder > 0) {
     groupSizes.push(groupSizeReminder * MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND)
   }
 
-  const averageGroupSize = Math.ceil(average(groupSizes))
-  return from(Array(Math.ceil(groupSize)).fill(averageGroupSize))
+  return groupSizes
 }
 
-function getMoneyPerGroup(groupSize: number, moneyToSpend: number, commisionSize: number): number {
-  const currentDepthTransactionsCount = Math.ceil(groupSize)
+function getMoneyPerGroup(groupSizes: number[], moneyToSpend: number, commisionSize: number): number[] {
+  const currentDepthCommisionSize = sum(groupSizes.map(groupSize => (
+    commisionSize + (groupSize - 1) * (commisionSize / 2)
+  )))
 
-  const currentDepthCommisionSize = currentDepthTransactionsCount * (
-    commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * (commisionSize / 2)
-  )
+  const moneyToSpendWithoutCommisionSize = moneyToSpend - currentDepthCommisionSize
+  const groupSizesSum = sum(groupSizes)
 
-  return Math.ceil((moneyToSpend - currentDepthCommisionSize) / Math.ceil(groupSize))
+  return groupSizes.map(groupSize => roundUpAtMostTwoDecimalPlaces(moneyToSpendWithoutCommisionSize * groupSize / groupSizesSum))
 }
 
 export function proccessTransactionGroups(
@@ -40,18 +40,20 @@ export function proccessTransactionGroups(
   })
 
   if (depthIndex === 0) {
-    return createWalletsWithBalance$((
+    return createWalletsWithBalance$(Array(groupSize).fill(
       context.transeferedCoinAmount + commisionSize * 52
-    ), groupSize, generateWallet, context)
+    ), groupSize, generateWallet, context).pipe(
+      map(([wallet, _]) => wallet)
+    )
   }
 
-  const moneyPerGroup = getMoneyPerGroup(groupSize, moneyToSpend, commisionSize)
+  const groupSizes = createGroupSizes(groupSize, roundUpAtMostTwoDecimalPlaces(groupSize % 1))
+  const moneyPerGroup = getMoneyPerGroup(groupSizes, moneyToSpend, commisionSize)
   const wallets$ = createWalletsWithBalance$(moneyPerGroup, Math.ceil(groupSize), generateWallet, context)
-  const groupSizes$ = createGroupSizes$(groupSize, groupSize % 1)
 
-  return zip(wallets$, groupSizes$).pipe(
-    mergeMap(([wallet, groupSize]) => (
-      proccessTransactionGroups(depthIndex - 1, groupSize, moneyPerGroup, commisionSize, generateWallet, {
+  return zip(wallets$, from(groupSizes)).pipe(
+    mergeMap(([[wallet, moneyToSpend], groupSize]) => (
+      proccessTransactionGroups(depthIndex - 1, groupSize, moneyToSpend, commisionSize, generateWallet, {
         ...context,
         privateKey: wallet.privateKey,
       })

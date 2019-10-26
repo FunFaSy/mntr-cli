@@ -14,10 +14,10 @@ export function mergeStringToNumberMaps(...maps: Map<string, number>[]): Map<str
   }, new Map<string, number>(headMap))
 }
 
-export async function backoffedPromise <T>(createPromise: () => Promise<T>) {
+export async function backoffedPromise <T>(createPromise: () => Promise<T>, ignoredStatusCodes: number[]) {
   const backoff = new FibonacciBackoff({
     min: 2000,
-    step: 1000,
+    step: 2000,
     jitter: 0.5,
   })
 
@@ -26,7 +26,7 @@ export async function backoffedPromise <T>(createPromise: () => Promise<T>) {
     try {
       return await createPromise()
     } catch (err) {
-      if (err.response && err.response.status !== 429) {
+      if (err.response && !ignoredStatusCodes.includes(err.response.status)) {
         throw err
       }
 
@@ -47,3 +47,4 @@ export const sleep = (milliseconds: number) => {
 export const sum = (numberArray: number[]): number => numberArray.reduce((a, b) => a + b, 0)
 export const average = (numberArray: number[]): number => numberArray.length !== 0 ? sum(numberArray) / numberArray.length : 0
 export const range = (start: number, stop: number, step: number) => Array.from({length: (stop - start) / step + 1}, (_, i) => start + (i * step))
+export const roundUpAtMostTwoDecimalPlaces = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100

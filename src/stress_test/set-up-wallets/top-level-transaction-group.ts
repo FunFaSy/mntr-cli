@@ -3,6 +3,7 @@ import {privateToAddressString} from 'minterjs-util'
 
 import {StressTestContext} from '../types'
 import {range, sum} from '../utils'
+
 import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, ONE_PIP} from './constants'
 
 export function getSmallestPossibleGroup(transactionsQuantity: number): { depthIndex: number, groupSize: number } {
@@ -52,7 +53,7 @@ export function getTotalMoneyNeeded(groupSize: number, depthIndex: number, commi
         const transactionsCount = depthIndex === 0 ? 1 : Math.ceil(groupSize) * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, currentDepthIndex - 1)
         const multiSendCommisionSize = transactionsCount * (
           commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * (commisionSize / 2)
-        )
+        ) * 2
         return multiSendCommisionSize
       }),
     ])
@@ -70,11 +71,11 @@ export async function getTopLevelTransactionGroup(walletsQuantity: number, conte
     message: `Top level group size: ${ groupSize }, Max Depth Index: ${ depthIndex }`
   })
 
-  const totalMoneyNeeded = getTotalMoneyNeeded(groupSize, depthIndex, commisionSize, context.transeferedCoinAmount);
+  const totalMoneyNeeded = getTotalMoneyNeeded(groupSize, depthIndex, commisionSize, context.transeferedCoinAmount)
 
   context.logger.debug({
     message: `Total money needed: ${ totalMoneyNeeded }`
   })
 
-  return { depthIndex, groupSize, totalMoneyNeeded, commisionSize };
+  return {depthIndex, groupSize, totalMoneyNeeded, commisionSize}
 }

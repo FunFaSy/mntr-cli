@@ -1,4 +1,4 @@
-import { getTotalMoneyNeeded } from "../top-level-transaction-group"
+import {getTotalMoneyNeeded} from '../top-level-transaction-group'
 
 describe('getTotalMoneyNeeded', () => {
   it('should return valid resut for depth 1', () => {

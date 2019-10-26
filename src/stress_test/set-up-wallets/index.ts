@@ -6,10 +6,10 @@ import {bufferCount, catchError, tap, toArray} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
 
-import {getTopLevelTransactionGroup} from './top-level-transaction-group';
 import {ONE_PIP} from './constants'
 import {WalletsGenerator} from './create-wallets-with-balance'
 import {proccessTransactionGroups} from './proccess-transaction-groups'
+import {getTopLevelTransactionGroup} from './top-level-transaction-group'
 import {withWorkerPool} from './with-worker-pool'
 
 export async function setUpWallets$(
@@ -17,7 +17,7 @@ export async function setUpWallets$(
   generateWallets: WalletsGenerator,
   context: StressTestContext
 ): Promise<Observable<Wallet>> {
-  const { depthIndex, groupSize, commisionSize, totalMoneyNeeded } = await getTopLevelTransactionGroup(walletsQuantity, context);
+  const {depthIndex, groupSize, commisionSize, totalMoneyNeeded} = await getTopLevelTransactionGroup(walletsQuantity, context)
 
   let proccesedWalletsQunatity = 0
   return proccessTransactionGroups(depthIndex, groupSize, totalMoneyNeeded, commisionSize, generateWallets, context).pipe(

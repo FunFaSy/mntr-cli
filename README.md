@@ -8,7 +8,7 @@ mntr-cli
 [![Downloads/week](https://img.shields.io/npm/dw/mntr-cli.svg)](https://npmjs.org/package/mntr-cli)
 [![License](https://img.shields.io/npm/l/mntr-cli.svg)](https://github.com/tasyp/mntr-cli/blob/master/package.json)
 
-A simple but very powerful tool to use to test any node for reliability.
+A simple but very powerful tool to test any node for reliability.
 
 Features:
 

@@ -1,6 +1,6 @@
 import {MultisendTxParams} from 'minter-js-sdk'
 import pThrottle from 'p-throttle'
-import {from} from 'rxjs'
+import {from, zip} from 'rxjs'
 import {delay, mergeMap} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
@@ -13,49 +13,54 @@ const rateLimiter = pThrottle(async (func: () => Promise<any>) => {
 export type WalletsGenerator = (walletsQuantity: number) => Promise<Wallet[]>
 
 export async function createWalletsWithBalance(
-  initialBalance: number,
+  initialBalances: number[],
   walletsQuantity: number, // 100 is max
   generateWallets: WalletsGenerator,
   context: StressTestContext
-): Promise<Wallet[]> {
+): Promise<[Wallet[], number[]]> {
   if (walletsQuantity > 100) {
     throw Error('You cannot create more than 100 wallets with initial balance at once.')
+  }
+  if (initialBalances.length !== walletsQuantity) {
+    throw Error('Length of the balance array should match to the equantity of requestes wallets.')
   }
 
   const wallets: Wallet[] = await generateWallets(walletsQuantity)
 
   await rateLimiter(() => (
-    backoffedPromise(() =>
+    backoffedPromise(() => (
       context.minterClient.postTx(
         new MultisendTxParams({
           privateKey: context.privateKey,
-          list: wallets.map(wallet => ({
-            value: initialBalance,
+          list: wallets.map((wallet, walletIndex) => ({
+            value: initialBalances[walletIndex],
             coin: context.coin,
             to: wallet.address,
           })),
           feeCoinSymbol: context.coin,
         }), {gasRetryLimit: 4}
       )
-    )
+    ), [429, 502])
   ))
 
-  return wallets
+  return [wallets, initialBalances]
 }
 
 export const createWalletsWithBalance$ = (
-  initialBalance: number,
+  initialBalances: number[],
   walletsQuantity: number, // 100 is max
   generateWallets: WalletsGenerator,
   context: StressTestContext
 ) => (
   from(createWalletsWithBalance(
-    initialBalance,
+    initialBalances,
     walletsQuantity,
     generateWallets,
     context,
   )).pipe(
     delay(5000),
-    mergeMap(wallets => wallets)
+    mergeMap(([wallets, initialBalances]) => (
+      zip(from(wallets), from(initialBalances))
+    ))
   )
 )
