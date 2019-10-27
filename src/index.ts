@@ -21,6 +21,7 @@ class Mntr extends Command {
     amount: flags.string({char: 'a', default: '0.0001', description: 'The amount of coins used for test transactions'}),
     maxSockets: flags.integer({char: 'm', default: 2048, description: 'Max sockets amount'}),
     chainId: flags.string({char: 'i', default: '2', description: 'Chain ID to use: 1 for mainnet and 2 for testnet'}),
+    headers: flags.string({description: 'Headers to use for requests', multiple: true}),
   }
 
   async run() {
@@ -40,6 +41,13 @@ class Mntr extends Command {
       address: flags.send_to,
       nodeBaseUrl: flags.node,
       durationInSeconds: flags.duration,
+      headers: flags.headers.map(header => {
+        const [key, value] = header.split(':', 2)
+        return {
+          key,
+          value
+        }
+      })
     })
     const stressTestResult = await stressTest$.toPromise()
 

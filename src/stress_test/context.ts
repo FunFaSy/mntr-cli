@@ -15,6 +15,10 @@ export const createStressTestContext = (params: StressTestParams): StressTestCon
       timeout: 10 * 1000,
       rejectUnauthorized: false
     }),
+    headers: params.headers.reduce((headers, header) => ({
+      ...headers,
+      [header.key]: header.value,
+    }), {})
   })
 
   const logger = winston.createLogger({

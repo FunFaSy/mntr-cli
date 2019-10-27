@@ -6,6 +6,11 @@ export interface Wallet {
   privateKey: string
 }
 
+interface Header {
+  key: string
+  value: string
+}
+
 export interface StressTestParams {
   rate: number
   privateKey: string
@@ -15,7 +20,8 @@ export interface StressTestParams {
   transeferedCoinAmount: number
   coin: string
   chainId: string
-  nodeBaseUrl: string
+  nodeBaseUrl: string,
+  headers: Header[],
 }
 
 export type StressTestContext = StressTestParams & {

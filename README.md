@@ -39,6 +39,7 @@ $ ./bin/run -p PRIVATE_KEY -n https://gungnir.stakeholder.space --rate 100 --dur
 
 Available CLI arguments
 
+* `--help / -h` - Gives you a manual with description of all available params 
 * `--privateKey / -p` _[string]_  - Wallet private key which will be used to send transactions.
 * `--node / -n` _[string]_ - A node URI to connect to.
 * `--send_to / -s` _[string]_ - The address of test transactions retriever
@@ -48,3 +49,7 @@ Available CLI arguments
 * `--amount / -a` _[float='0.01']_ - The amount of coins used for a test transactions
 * `--maxSockets / -m` _[integer=2048]_ - Max sockets amount
 * `--chainId / -i` _[string='2']_ - Chain ID to use: 1 for mainnet and 2 for testnet
+* `--headers` _[string]_ - Headers to use for requests. Format -`Key:Value`. It can be used multiple times to use many headers at once, e.g.:
+```
+mntr-cli --headers "X-Project-Id:project-id" --headers "X-Project-Secret:secret"
+```
