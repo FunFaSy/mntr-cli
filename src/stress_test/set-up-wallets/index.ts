@@ -80,6 +80,6 @@ export async function setUpWallets(walletsQuantity: number, rate: number, contex
       }`)
     }
     const responseStatus = dotProp.get<number | undefined>(err, 'response.status')
-    throw new CLIError(`Error occured while creatings wallets. Check logs. ${ responseStatus ? `Status code #${ responseStatus }` : '' }`)
+    throw new CLIError(`Error occured while creatings wallets. ${ responseStatus ? `Status code #${ responseStatus }` : '' }`)
   }
 }
