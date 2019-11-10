@@ -1,6 +1,6 @@
 import cli from 'cli-ux'
 import {from, interval, Observable, zip} from 'rxjs'
-import {map, mergeMap, reduce, share, take, tap} from 'rxjs/operators'
+import {mergeMap, reduce, share, take, tap} from 'rxjs/operators'
 
 import {createStressTestContext} from './context'
 import {convertRequestStatusesToTransactionBanchStats, RequestStatus} from './request-status'
@@ -44,11 +44,11 @@ export async function createStressTest(
         cli.action.start(`Received responses ${ receivedRequests }/${ walletsQuantity}`)
       }
     }),
-    map((requestStatuses: RequestStatus): TransactionBatchStats => (
-      convertRequestStatusesToTransactionBanchStats([requestStatuses])
-    )),
-    reduce((stressTestResult: TransactionBatchStats, transactionsBanchResult: TransactionBatchStats): TransactionBatchStats => (
-      mergeTransactionBatchStats(stressTestResult, transactionsBanchResult)
+    reduce((stressTestResult: TransactionBatchStats, requestStatus: RequestStatus): TransactionBatchStats => (
+      mergeTransactionBatchStats(
+        stressTestResult, 
+        convertRequestStatusesToTransactionBanchStats([requestStatus])
+      )
     ), getInitialTransactionBatchStats()),
     share()
   )
