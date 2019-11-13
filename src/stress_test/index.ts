@@ -46,7 +46,7 @@ export async function createStressTest(
     }),
     reduce((stressTestResult: TransactionBatchStats, requestStatus: RequestStatus): TransactionBatchStats => (
       mergeTransactionBatchStats(
-        stressTestResult, 
+        stressTestResult,
         convertRequestStatusesToTransactionBanchStats([requestStatus])
       )
     ), getInitialTransactionBatchStats()),

@@ -5,6 +5,7 @@ import {delay, mergeMap} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
 import {backoffedPromise} from '../utils'
+
 import {ONE_BLOCK_PROCESSING_TIME_IN_MILLISECONDS} from './constants'
 
 const rateLimiter = pThrottle(async (func: () => Promise<any>) => {

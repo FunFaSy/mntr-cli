@@ -6,10 +6,10 @@ import {bufferCount, catchError, tap, toArray} from 'rxjs/operators'
 
 import {StressTestContext, Wallet} from '../types'
 
-import {ONE_PIP} from './constants'
 import {WalletsGenerator} from './create-wallets-with-balance'
 import {proccessTransactionGroups} from './proccess-transaction-groups'
 import {getTopLevelTransactionGroup} from './top-level-transaction-group'
+import {getCommisionSize, getQuantityOfCoinsFromErrorMessage} from './utils'
 import {withWorkerPool} from './with-worker-pool'
 
 export async function setUpWallets$(
@@ -17,10 +17,12 @@ export async function setUpWallets$(
   generateWallets: WalletsGenerator,
   context: StressTestContext
 ): Promise<Observable<Wallet>> {
-  const {depthIndex, groupSize, commisionSize, totalMoneyNeeded} = await getTopLevelTransactionGroup(walletsQuantity, context)
+  const commisionSize = await getCommisionSize(context)
+  const minGasPrice = await context.minterClient.getMinGasPrice()
+  const {depthIndex, groupSize, totalMoneyNeeded} = await getTopLevelTransactionGroup(walletsQuantity, commisionSize, minGasPrice, context)
 
   let proccesedWalletsQunatity = 0
-  return proccessTransactionGroups(depthIndex, groupSize, totalMoneyNeeded, commisionSize, generateWallets, context).pipe(
+  return proccessTransactionGroups(depthIndex, groupSize, totalMoneyNeeded, commisionSize, minGasPrice, generateWallets, context).pipe(
     tap(() => {
       if (proccesedWalletsQunatity < walletsQuantity) {
         proccesedWalletsQunatity = proccesedWalletsQunatity + 1
@@ -40,23 +42,6 @@ export async function setUpWallets$(
       return throwError(err)
     }),
   )
-}
-
-const getQuantityOfCoinsFromErrorMessage = (coin: string, txResultMessage?: string): number | null => {
-  if (txResultMessage === undefined) {
-    return null
-  }
-  const re = new RegExp(`Wanted\\s+(\\d+)\\s+${ coin.toUpperCase() }`)
-  const quantityOfCoinsMatches = txResultMessage.match(re)
-  if (quantityOfCoinsMatches === null) {
-    return null
-  }
-  const coinsQuantity: string | undefined = quantityOfCoinsMatches[1]
-  if (coinsQuantity === undefined) {
-    return null
-  }
-  const possiblyNumber = parseInt(coinsQuantity.trim(), 10)
-  return !isNaN(possiblyNumber) ? possiblyNumber / ONE_PIP : null
 }
 
 export async function setUpWallets(walletsQuantity: number, rate: number, context: StressTestContext) {

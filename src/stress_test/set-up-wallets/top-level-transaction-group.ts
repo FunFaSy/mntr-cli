@@ -1,10 +1,7 @@
-import {prepareSignedTx, SendTxParams} from 'minter-js-sdk'
-import {privateToAddressString} from 'minterjs-util'
-
 import {StressTestContext} from '../types'
 import {range, sum} from '../utils'
 
-import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, ONE_PIP} from './constants'
+import {MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND} from './constants'
 
 export function getSmallestPossibleGroup(transactionsQuantity: number): { depthIndex: number, groupSize: number } {
   let groupSize = transactionsQuantity
@@ -19,32 +16,15 @@ export function getSmallestPossibleGroup(transactionsQuantity: number): { depthI
   }
 }
 
-export async function getCommisionSize(context: StressTestContext): Promise<number> {
-  const commisionSize = await context.minterClient.estimateTxCommission({
-    transaction: prepareSignedTx(
-      new SendTxParams({
-        privateKey: context.privateKey,
-        nonce: 1,
-        address: privateToAddressString(Buffer.from(context.privateKey, 'hex')),
-        amount: 1,
-        coinSymbol: context.coin,
-        feeCoinSymbol: context.coin,
-      })
-    ).serialize().toString('hex')
-  })
-  return commisionSize / ONE_PIP
-}
-
-export function getZeroDepthMoneyNeeded(groupSize: number, depthIndex: number, commisionSize: number, context: StressTestContext): number {
+export function getZeroDepthMoneyNeeded(groupSize: number, depthIndex: number, commisionSize: number, transeferedCoinAmount: number): number {
   const zeroDepthTransactionsCount = groupSize * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, depthIndex)
   return (
-    zeroDepthTransactionsCount * (context.transeferedCoinAmount + commisionSize * 52)
+    zeroDepthTransactionsCount * (transeferedCoinAmount + commisionSize * 52)
   )
 }
 
-export function getTotalMoneyNeeded(groupSize: number, depthIndex: number, commisionSize: number, transeferedCoinAmount: number) {
-  const zeroDepthTransactionsCount = groupSize * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, depthIndex)
-  const zeroDepthMoneyNeeded = zeroDepthTransactionsCount * (transeferedCoinAmount + commisionSize * 52)
+export function getTotalMoneyNeeded(groupSize: number, depthIndex: number, commisionSize: number, transeferedCoinAmount: number, minGasPrice: number) {
+  const zeroDepthMoneyNeeded = getZeroDepthMoneyNeeded(groupSize, depthIndex, commisionSize, transeferedCoinAmount)
 
   return Math.ceil(
     sum([
@@ -53,16 +33,20 @@ export function getTotalMoneyNeeded(groupSize: number, depthIndex: number, commi
         const transactionsCount = depthIndex === 0 ? 1 : Math.ceil(groupSize) * Math.pow(MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND, currentDepthIndex - 1)
         const multiSendCommisionSize = transactionsCount * (
           commisionSize + (MAX_QUANTITY_OF_TRANSCATIONS_IN_MULTI_SEND - 1) * (commisionSize / 2)
-        ) * 2
+        ) * (minGasPrice + 2)
         return multiSendCommisionSize
       }),
     ])
   )
 }
 
-export async function getTopLevelTransactionGroup(walletsQuantity: number, context: StressTestContext) {
+export async function getTopLevelTransactionGroup(
+  walletsQuantity: number,
+  commisionSize: number,
+  minGasPrice: number,
+  context: StressTestContext
+) {
   const {depthIndex, groupSize} = getSmallestPossibleGroup(walletsQuantity)
-  const commisionSize = await getCommisionSize(context)
 
   context.logger.debug({
     message: `Needed Wallets Quantity: ${ walletsQuantity }`
@@ -71,11 +55,11 @@ export async function getTopLevelTransactionGroup(walletsQuantity: number, conte
     message: `Top level group size: ${ groupSize }, Max Depth Index: ${ depthIndex }`
   })
 
-  const totalMoneyNeeded = getTotalMoneyNeeded(groupSize, depthIndex, commisionSize, context.transeferedCoinAmount)
+  const totalMoneyNeeded = getTotalMoneyNeeded(groupSize, depthIndex, commisionSize, context.transeferedCoinAmount, minGasPrice)
 
   context.logger.debug({
     message: `Total money needed: ${ totalMoneyNeeded }`
   })
 
-  return {depthIndex, groupSize, totalMoneyNeeded, commisionSize}
+  return {depthIndex, groupSize, totalMoneyNeeded}
 }

@@ -16,10 +16,10 @@ export function createGroupSizes(groupSize: number, groupSizeReminder: number): 
   return groupSizes
 }
 
-function getMoneyPerGroup(groupSizes: number[], moneyToSpend: number, commisionSize: number): number[] {
+function getMoneyPerGroup(groupSizes: number[], moneyToSpend: number, commisionSize: number, minGasPrice: number): number[] {
   const currentDepthCommisionSize = sum(groupSizes.map(groupSize => (
     commisionSize + (groupSize - 1) * (commisionSize / 2)
-  )))
+  ) * minGasPrice))
 
   const moneyToSpendWithoutCommisionSize = moneyToSpend - currentDepthCommisionSize
   const groupSizesSum = sum(groupSizes)
@@ -32,6 +32,7 @@ export function proccessTransactionGroups(
   groupSize: number,
   moneyToSpend: number,
   commisionSize: number,
+  minGasPrice: number,
   generateWallet: WalletsGenerator,
   context: StressTestContext
 ): Observable<Wallet> {
@@ -48,12 +49,12 @@ export function proccessTransactionGroups(
   }
 
   const groupSizes = createGroupSizes(groupSize, roundUpAtMostTwoDecimalPlaces(groupSize % 1))
-  const moneyPerGroup = getMoneyPerGroup(groupSizes, moneyToSpend, commisionSize)
+  const moneyPerGroup = getMoneyPerGroup(groupSizes, moneyToSpend, commisionSize, minGasPrice)
   const wallets$ = createWalletsWithBalance$(moneyPerGroup, Math.ceil(groupSize), generateWallet, context)
 
   return zip(wallets$, from(groupSizes)).pipe(
     mergeMap(([[wallet, moneyToSpend], groupSize]) => (
-      proccessTransactionGroups(depthIndex - 1, groupSize, moneyToSpend, commisionSize, generateWallet, {
+      proccessTransactionGroups(depthIndex - 1, groupSize, moneyToSpend, commisionSize, minGasPrice, generateWallet, {
         ...context,
         privateKey: wallet.privateKey,
       })

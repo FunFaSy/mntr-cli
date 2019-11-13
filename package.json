@@ -14,7 +14,7 @@
     "@oclif/plugin-help": "^2",
     "cli-ux": "^5.3.2",
     "dot-prop": "^5.1.0",
-    "minter-js-sdk": "^0.20.2",
+    "minter-js-sdk": "^0.21.0",
     "minterjs-util": "^0.13.0",
     "node-worker-threads-pool": "^1.1.0",
     "p-limit": "^2.2.1",

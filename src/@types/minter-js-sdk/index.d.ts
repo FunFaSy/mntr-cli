@@ -13,6 +13,7 @@ declare module 'minter-js-sdk' {
     constructor(options: MinterClientOptions)
     postTx(txParams: TxParams, params?: { gasRetryLimit?: number }): Promise<string>
     estimateTxCommission(tx: any): Promise<number>
+    getMinGasPrice(): Promise<number>
   }
 
   type MinterTx = {}
